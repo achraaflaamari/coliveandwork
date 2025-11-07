@@ -1,0 +1,43 @@
+api_platform:
+    # --- Métadonnées de base ---
+    title: 'Colive&Work API'
+    description: >
+        API REST du projet Colive&Work : plateforme de co-living et de co-working.
+    version: '1.0.0'
+
+    # --- Activation des outils intégrés ---
+    enable_swagger: true
+    enable_swagger_ui: true
+    enable_re_doc: true
+    enable_entrypoint: true
+    enable_docs: true
+
+    # --- Localisation des entités exposées ---
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src/Entity'
+
+    # --- Formats supportés ---
+    formats:
+        jsonld:
+            mime_types: ['application/ld+json']
+        json:
+            mime_types: ['application/json']
+        html:
+            mime_types: ['text/html']
+
+    # --- Configuration de la pagination ---
+    defaults:
+        pagination_enabled: true
+        pagination_items_per_page: 10
+        stateless: true     # Important pour JWT (pas de session)
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+
+    # --- Authentification Swagger (pour JWT plus tard) ---
+    swagger:
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header
+
