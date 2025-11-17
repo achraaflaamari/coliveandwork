@@ -163,19 +163,8 @@ try {
 }
 ```
 
-#### C. Validation des Données
-```php
-$errors = $this->validator->validate($entity);
-if (count($errors) > 0) {
-    $errorMessages = [];
-    foreach ($errors as $error) {
-        $errorMessages[] = $error->getMessage();
-    }
-    return $this->json(['errors' => $errorMessages], 400);
-}
-```
 
-#### D. Formatage des Réponses
+#### C. Formatage des Réponses
 ```php
 $formattedData = [];
 foreach ($entities as $entity) {
@@ -232,36 +221,7 @@ access_control:
 - `GET /api/reservations/my-reservations` - Mes réservations
 - `PATCH /api/reservations/{id}/status` - Modifier statut réservation
 
-## 🔧 Outils de Développement
 
-### Tests des APIs
-```bash
-# Tester une API
-curl -X GET "http://127.0.0.1:8000/api/coliving_cities" -H "Accept: application/json"
-
-# Avec authentification JWT
-curl -X GET "http://127.0.0.1:8000/api/reservations/my-reservations" \
-     -H "Authorization: Bearer YOUR_JWT_TOKEN"
-```
-
-### Documentation API
-- Interface Swagger : `http://127.0.0.1:8000/api/docs`
-- Format JSON-LD : `http://127.0.0.1:8000/api/docs.json`
-
-### Commandes Utiles
-```bash
-# Vider le cache
-php bin/console cache:clear
-
-# Créer une migration
-php bin/console make:migration
-
-# Appliquer les migrations
-php bin/console doctrine:migrations:migrate
-
-# Recharger les fixtures
-php bin/console doctrine:fixtures:load --no-interaction
-```
 
 ## 🏗️ Architecture
 
