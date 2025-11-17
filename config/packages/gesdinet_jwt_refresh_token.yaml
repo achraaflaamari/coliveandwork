@@ -1,0 +1,6 @@
+gesdinet_jwt_refresh_token:
+    refresh_token_class: App\Entity\RefreshToken   # Classe utilisée pour stocker les tokens
+    ttl: 2592000            # (Optionnel) Durée de validité en secondes (30 jours)
+    ttl_update: true        # (Optionnel) Met à jour la durée de vie à chaque utilisation
+    single_use: false       # (Optionnel) false = le token peut être réutilisé
+    return_expiration: true # (Optionnel) ajoute la date d’expiration dans la réponse

@@ -1,0 +1,81 @@
+security:
+    # Hashage des mots de passe
+    password_hashers:
+        App\Entity\User:
+            algorithm: auto
+
+    # Chargement des utilisateurs depuis l'entité User
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    # --- Hiérarchie des rôles ---
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_EMPLOYEE, ROLE_OWNER, ROLE_CLIENT, ROLE_USER]
+        ROLE_EMPLOYEE: [ROLE_OWNER, ROLE_CLIENT, ROLE_USER]
+        ROLE_OWNER: [ROLE_CLIENT, ROLE_USER]
+        ROLE_CLIENT: [ROLE_USER]                
+
+    firewalls:
+        # Exclut les routes internes de Symfony (debug, assets…)
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Firewall principal pour toutes les routes /api
+        api:
+            pattern: ^/api
+            stateless: true     # Pas de session, tout passe par le token
+            entry_point: jwt
+            provider: app_user_provider     # nécessaire pour identifier l’utilisateur
+
+            # Connexion : envoie email + password à /api/login_check
+            json_login:
+                check_path: /api/login_check
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success                
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+            # Vérifie le JWT sur les routes protégées
+            jwt: ~
+
+            # Rafraîchit le JWT avec le refresh_token
+            refresh_jwt:
+                check_path: /api/token/refresh
+
+        # Firewall principal Symfony 
+        main:
+            lazy: true
+            provider: app_user_provider
+
+    # Autorise les routes publiques et protège le reste
+    access_control:
+        - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
+        - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        
+        # Routes publiques pour le frontend (lecture seule)
+        - { path: ^/api/coliving_cities, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/private_spaces, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/photos, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/auth/register, roles: PUBLIC_ACCESS, methods: [POST] }
+
+        # accès par rôle 
+        - { path: ^/api/admin, roles: ROLE_ADMIN }
+        - { path: ^/api/employee, roles: ROLE_EMPLOYEE }
+        - { path: ^/api/owner, roles: ROLE_OWNER }
+        - { path: ^/api/client, roles: ROLE_CLIENT }
+        - { path: ^/api, roles: ROLE_USER }
+
+# Configuration pour les tests unitaires
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10
